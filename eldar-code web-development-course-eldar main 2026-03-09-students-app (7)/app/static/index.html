@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Students App</title>
+    <!--    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>-->
+    <script src="/static/axios.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+    <script defer src="/static/main.js"></script>
+</head>
+
+<body>
+<h1>Students Application</h1>
+
+<p>
+    <label for="idBox">ID: </label>
+    <input id="idBox" type="number">
+    <br>
+    <label for="nameBox">Name: </label>
+    <input id="nameBox" type="text">
+    <br>
+    <label for="ageBox">Age: </label>
+    <input id="ageBox" type="number">
+    <br>
+</p>
+<p>
+    <button id="btAdd" class="add">Add Student</button>
+    <button id="btUpdate" class="update">Update Student</button>
+    <button id="btDelete" class="delete">Delete Student</button>
+</p>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>X</th>
+    </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+</table>
+</body>
+
+</html>

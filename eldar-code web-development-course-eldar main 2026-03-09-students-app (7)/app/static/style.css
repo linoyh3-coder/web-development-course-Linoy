@@ -1,0 +1,38 @@
+body {
+    font-family: sans-serif;
+    font-size: large;
+    background-color: palegoldenrod;
+}
+
+table {
+    width: 80%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+tr,
+th,
+td {
+    border: 1px solid;
+}
+
+label {
+    display: inline-block;
+    width: 70px;
+    margin-bottom: 5px;
+}
+
+.add {
+    color: green;
+    font-size: large;
+}
+
+.delete {
+    color: red;
+    font-size: large;
+}
+
+.update {
+    color: purple;
+    font-size: large;
+}
