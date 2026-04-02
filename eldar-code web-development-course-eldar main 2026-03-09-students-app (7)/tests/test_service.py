@@ -107,12 +107,13 @@ class TestService(TestCase):
         self.assertEqual(4, mock_update_student.call_count)
 
     @patch("app.service.db.update_student")
-    def test_Student_must_have_a_name_with_minimum_length(self, mock_update_student: Mock):
+    def test_update_Student_must_have_a_name_with_minimum_length(self, mock_update_student: Mock):
         mock_update_student.return_value = {'name': 'Mock Student', 'age': 25, 'id': 101}
         student = {'name': 'M', 'age': 25, 'id': 101}
         result = service.update_student(student)
         self.assertEqual({'name': 'Mock Student', 'age': 25, 'id': 101}, result)
         mock_update_student.assert_called_once_with(student)
+
 
     # ============== Update Student - Negative Tests =============== #
 
@@ -133,6 +134,27 @@ class TestService(TestCase):
         mock_update_student.side_effect = ServiceError("Student name is illegal")
         self.assertRaises(ServiceError, service.update_student, {'name': '', 'age': 40, 'id': 101})
         mock_update_student.assert_not_called()
+
+    @patch("app.service.db.update_student")
+    def test_update_student_name_none(self, mock_update_student: Mock):
+        mock_update_student.side_effect = ServiceError("Student name is illegal")
+        self.assertRaises(ServiceError, service.update_student,{'name':[None], 'age': 25, 'id': 101})
+        mock_update_student.assert_called_once()
+
+    @patch("app.service.db.update_student")
+    def test_update_student_name_with_numbers(self, mock_update_student: Mock):
+        mock_update_student.side_effect = ServiceError("Student name is illegal")
+        self.assertRaises(ServiceError, service.update_student,{'name': [12], 'age': 25, 'id': 101})
+        mock_update_student.assert_called_once()
+
+    @patch("app.service.db.update_student")
+    def test_update_student_name_with_type_float(self, mock_update_student: Mock):
+        mock_update_student.side_effect = ServiceError("Student name is illegal")
+        self.assertRaises(ServiceError, service.update_student, {'name': [99.3], 'age': 25, 'id': 101})
+        mock_update_student.assert_called_once()
+
+
+
 
 
 
