@@ -70,24 +70,74 @@ class TestService(TestCase):
             self.assertEqual({'name': 'Mock Student', 'age': 25, 'id': 101}, result)
         self.assertEqual(4, mock_add_student.call_count)
 
+    @patch("app.service.db.add_student")
+    def test_add_student_name_case(self, mock_add_student: Mock):
+        mock_add_student.return_value = {'name': 'Mock Student', 'age': 25, 'id': 101}
+        students = [
+            {'name': 'Danny', 'age': 25, 'id': 101},
+            {'name': 'DaNNy', 'age': 25, 'id': 101},
+            {'name': 'danny Student', 'age': 25, 'id': 101}
+        ]
+        for s in students:
+            result = service.add_student(s)
+            self.assertEqual({'name': 'Mock Student', 'age': 25, 'id': 101}, result)
+        self.assertEqual(3,mock_add_student.call_count)
+
+    @patch("app.service.db.add_student")
+    def test_add_student_name_special_chars(self, mock_add_student: Mock):
+        mock_add_student.return_value = {'name': 'Mock Student', 'age': 25, 'id': 101}
+        students = [
+            {'name': 'Anne-Marie', 'age': 25, 'id': 101},
+            {'name': 'J.K. Rowling', 'age': 25, 'id': 101},
+            {'name': 'O&Connor', 'age': 25, 'id': 101}
+        ]
+        for s in students:
+            result = service.add_student(s)
+            self.assertEqual({'name': 'Mock Student', 'age': 25, 'id': 101}, result)
+        self.assertEqual(3, mock_add_student.call_count)
+
     # ============== Add Student - Negative Tests =============== #
 
     @patch("app.service.db.add_student")
     def test_add_student_too_old(self, mock_add_student: Mock):
         mock_add_student.side_effect = ServiceError("add student failed")
-        self.assertRaises(ServiceError, service.add_student, {'name': 'Mock Student', 'age': 142, 'id': 101})
+        self.assertRaises(ServiceError, service.add_student, {'name': 'Mock Student', 'age': 121, 'id': 101})
         mock_add_student.assert_not_called()
 
     @patch("app.service.db.add_student")
     def test_add_student_too_young(self, mock_add_student: Mock):
         mock_add_student.side_effect = ServiceError("add student failed")
-        self.assertRaises(ServiceError, service.add_student, {'name': 'Mock Student', 'age': 11, 'id': 101})
+        self.assertRaises(ServiceError, service.add_student, {'name': 'Mock Student', 'age': 17, 'id': 101})
         mock_add_student.assert_not_called()
 
     @patch("app.service.db.add_student")
     def test_add_student_no_letters(self, mock_add_student: Mock):
         mock_add_student.side_effect = ServiceError("Student name is illegal")
-        self.assertRaises(ServiceError, service.add_student, {'name': '', 'age': 11, 'id': 101})
+        self.assertRaises(ServiceError, service.add_student, {'name': '', 'age': 25, 'id': 101})
+        mock_add_student.assert_not_called()
+
+    @patch("app.service.db.add_student")
+    def test_add_student_missing_age(self, mock_add_student: Mock):
+        mock_add_student.side_effect = KeyError("add student failed")
+        self.assertRaises(KeyError, service.add_student, {'name': 'Test'})
+        mock_add_student.assert_not_called()
+
+    @patch("app.service.db.add_student")
+    def test_add_student_missing_name(self, mock_add_student: Mock):
+        mock_add_student.side_effect = TypeError("add student failed")
+        self.assertRaises(TypeError, service.add_student, {'age': '25'})
+        mock_add_student.assert_not_called()
+
+    @patch("app.service.db.add_student")
+    def test_add_student_age_not_int(self, mock_add_student: Mock):
+        mock_add_student.side_effect = TypeError("add student failed")
+        self.assertRaises(TypeError, service.add_student, {'age': 'twenty'})
+        mock_add_student.assert_not_called()
+
+    @patch("app.service.db.add_student")
+    def test_add_student_name_not_string(self, mock_add_student: Mock):
+        mock_add_student.side_effect = TypeError("add student failed")
+        self.assertRaises(TypeError, service.add_student, {'name': 123, 'age': 25})
         mock_add_student.assert_not_called()
 
     # ============== Update Student - Positive Tests =============== #
