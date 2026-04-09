@@ -205,10 +205,30 @@ class TestService(TestCase):
 
 # {'id': 1, 'name': 'John Doe', 'age': 20}
     @patch("app.service.db.delete_student")
-    def test_delete_student(self, mock_delete_student: Mock):
+    def test_delete_student_positive_id_number(self, mock_delete_student: Mock):
         mock_delete_student.return_value = {'name': 'Mock Student', 'age': 25, 'id': 101}
         result = service.delete_student(1)
         self.assertEqual(result, {'name': 'Mock Student', 'age': 25, 'id': 101})
         mock_delete_student.assert_called_once_with(1)
 
+    @patch("app.service.db.delete_student")
+    def test_delete_student_large_id_number(self, mock_delete_student: Mock):
+        mock_delete_student.return_value = {'name': 'Mock Student', 'age': 25, 'id': 101}
+        result = service.delete_student(10000)
+        self.assertEqual(result,{'name': 'Mock Student', 'age': 25, 'id': 101})
+        mock_delete_student.assert_called_once_with(10000)
+
+
+    # ============== Delete Student - Negative Tests =============== #
+    @patch("app.service.db.delete_student")
+    def test_delete_student_negative_id_numbers(self, mock_delete_student: Mock):
+        mock_delete_student.side_effect = ServiceError("Delete student failed")
+        self.assertRaises(ServiceError, service.delete_student, -2)
+        mock_delete_student.assert_called_once()
+
+    @patch("app.service.db.delete_student")
+    def test_delete_student_str_id_student_stype(self, mock_delete_student: Mock):
+        mock_delete_student.side_effect = ServiceError("Delete student failed")
+        self.assertRaises(ServiceError, service.delete_student, "Joe")
+        mock_delete_student.assert_called_once()
 
