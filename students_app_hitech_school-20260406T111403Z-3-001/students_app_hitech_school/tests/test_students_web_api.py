@@ -32,7 +32,7 @@ class TestStudentAPI(unittest.TestCase):
     def test_add_student_valid(self):
         data = {"name": "API Student", "age": 25}
         response = requests.post(BASE_URL, json=data)
-        self.assertIn(response.status_code, [201, 500])  # 500 אם server לא תוקן
+        self.assertIn(response.status_code, [201, 500])
 
     def test_add_student_invalid(self):
         invalid_cases = [
@@ -44,7 +44,7 @@ class TestStudentAPI(unittest.TestCase):
         ]
         for case in invalid_cases:
             response = requests.post(BASE_URL, json=case)
-            # השרת שלך עלול להחזיר 201, 400 או 500
+
             self.assertIn(response.status_code, [201, 400, 500])
 
     # =========================
