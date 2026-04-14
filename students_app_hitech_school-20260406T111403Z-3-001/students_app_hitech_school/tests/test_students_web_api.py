@@ -1,5 +1,6 @@
 import pytest
 import requests
+from pymysql.constants.FIELD_TYPE import JSON
 
 BASE_URL = "http://127.0.0.1:5000/students"
 
@@ -93,6 +94,16 @@ def test_unique_ids():
 
     assert s1["id"] != s2["id"]
 
+def test_add_student_long_name():
+    long_name = "Test" * 1000
+    response = requests.post(BASE_URL, json={"name": long_name, "age": 22})
+
+    assert response.status_code == 500
+
+def test_add_student_extreme_negative_age():
+    response = requests.post(BASE_URL, json={"name": "Test", "age": -999})
+    assert response.status_code == 400
+
 
 def test_add_student_none():
     response = requests.post(BASE_URL, json=None)
@@ -147,6 +158,12 @@ def test_update_and_verify(new_student):
     get_res = requests.get(f"{BASE_URL}/{new_student['id']}")
     assert get_res.json()["name"] == "NewName"
 
+def test_update_non_existing():
+    data = {"id": 999999,"name": "Test", "age": 35}
+    response = requests.put(BASE_URL, json=data)
+
+    assert response.status_code == 404
+
 
 def test_update_empty_body():
     response = requests.put(BASE_URL, json={})
@@ -163,6 +180,15 @@ def test_delete_student_positive(new_student):
     response = requests.delete(f"{BASE_URL}/{student_id}")
     assert response.status_code == 200
 
+def test_delete_twice(new_student):
+    student_id = new_student["id"]
+
+    res1 = requests.delete(f"{BASE_URL}/{student_id}")
+    res2 = requests.delete(f"{BASE_URL}/{student_id}")
+
+    assert res1.status_code == 200
+    assert res2.status_code == 404
+
 
 def test_delete_and_verify(new_student):
     student_id = new_student["id"]
@@ -176,3 +202,27 @@ def test_delete_and_verify(new_student):
 def test_delete_student_invalid():
     response = requests.delete(f"{BASE_URL}/-1")
     assert response.status_code == 404
+
+
+# =========================
+# Functional TEST
+# =========================
+
+def test_full_flow():
+    # create
+    res = requests.post(BASE_URL, json={"name": "Flow", "age": 20})
+    student = res.json()
+
+    # update
+    requests.put(BASE_URL, json={"id": student["id"], "name": "Updated", "age": 30})
+
+    # verify update
+    res = requests.get(f"{BASE_URL}/{student['id']}")
+    assert res.json()["name"] == "Updated"
+
+    # delete
+    requests.delete(f"{BASE_URL}/{student['id']}")
+
+    # verify delete
+    res = requests.get(f"{BASE_URL}/{student['id']}")
+    assert res.status_code == 404

@@ -68,8 +68,8 @@ def test_age_not_number():
         add_student({"name": "DB", "age": "twenty"})
 
 
-
 # ----------------- READ TESTS ----------------- #
+
 def test_get_students_db(sample_student):
     students = get_students()
     assert any(s["id"] == sample_student["id"] for s in students)
@@ -94,6 +94,7 @@ def test_get_string_id():
 
 
 # ----------------- UPDATE TESTS ----------------- #
+
 def test_update_student_positive_db(sample_student):
     sample_student["name"] = "PyTest User"
     sample_student["age"] = 28
@@ -111,9 +112,8 @@ def test_update_only_id(sample_student):
         update_student({"id": sample_student["id"]})
 
 
-
-
 # ----------------- DELETE TESTS ----------------- #
+
 def test_delete_student_positive_db():
     student = add_student({"name": "PyTest User", "age": 35})
     deleted = delete_student(student["id"])
