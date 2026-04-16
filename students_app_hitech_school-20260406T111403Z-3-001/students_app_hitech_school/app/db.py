@@ -76,6 +76,15 @@ def delete_student(student_id):
     finally:
         con.close()
 
+def _clear_db():
+    con = _get_connection()
+    try:
+        cursor = con.cursor()
+        cursor.execute("truncate table students")
+        con.commit()
+    finally:
+        con.close()
+
 if __name__=="__main__":
     result = get_student(1)
     print(result)
