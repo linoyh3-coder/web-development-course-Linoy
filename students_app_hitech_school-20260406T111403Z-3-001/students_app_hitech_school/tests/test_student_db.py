@@ -2,7 +2,7 @@
 import pytest
 from pymysql import DataError
 
-from students_app_hitech_school.app.db import (
+from students_app_hitech_school.app_students.db import (
     get_students,
     add_student,
     get_student,
