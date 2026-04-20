@@ -220,6 +220,7 @@ class TestService(TestCase):
 
 
     # ============== Delete Student - Negative Tests =============== #
+
     @patch("app.service.db.delete_student")
     def test_delete_student_negative_id_numbers(self, mock_delete_student: Mock):
         mock_delete_student.side_effect = ServiceError("Delete student failed")

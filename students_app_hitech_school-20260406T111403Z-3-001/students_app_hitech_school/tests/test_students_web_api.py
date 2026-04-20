@@ -157,19 +157,36 @@ def test_add_student_mixed(base_url, name, age, expected_status):
         pytest.param("Aaa", 25, 201, id="positive age input"),
         pytest.param("Benny", 22, 201, id="positive name input"),
         pytest.param("Bob Young", 18, 201, id="positive low value input"),
-        pytest.param("", 25, 400, id="negative no name"),
-        pytest.param("A", 25, 400, id="negative short name"),
+        pytest.param("", 17, 400, id="negative too young"),
     ]
 )
-def test_add_student_mixed(base_url, name, age, expected_status):
+def test_update_student_mixed(base_url, name, age, expected_status):
     payload = {"name": name, "age": age}
     res = requests.post(base_url, json=payload)
 
     assert res.status_code == expected_status
 
+    if expected_status == 201:
+        data = res.json()
+        assert data["name"] == name
+        assert data["age"] == age
+        assert "id" in data
 
-    # ============== Delete Student - Positive Tests =============== #
 
+    # ============== Delete Student - Tests =============== #
 
+@pytest.mark.parametrize(
+    "student_id, expected_status",
+    [
+        pytest.param(1, 200, id="delete existing student"),
+        pytest.param(999, 404, id="delete non-existing student"),
+    ]
+)
+def test_delete_student_mixed(base_url, add_students, student_id, expected_status):
+    res = requests.delete(f"{base_url}/{student_id}")
+    assert res.status_code == expected_status
 
-
+    if expected_status == 200:
+        # לוודא שבאמת נמחק
+        res = requests.get(f"{base_url}/{student_id}")
+        assert res.status_code == 404
