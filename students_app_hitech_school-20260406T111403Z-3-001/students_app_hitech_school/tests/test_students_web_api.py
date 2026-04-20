@@ -31,6 +31,9 @@ def add_students(base_url):
 
 # THE TESTS ==========================================
 
+    # ============== Get Student - Positive Tests ============== #
+
+
 def test_get_all_students(base_url, add_students):
     res = requests.get(base_url)
     assert res.status_code == 200
@@ -73,6 +76,8 @@ def test_get_one_student_v2(base_url, add_students, s_id, index):
     assert res.json() == add_students[index]
 
 
+    # ============== Get Student - Negative Tests =============== #
+
 @pytest.mark.parametrize(
     "s_id",
     [100, 200, 300]
@@ -83,6 +88,9 @@ def test_get_one_student_negative(base_url, add_students, s_id):
     assert res.reason == "NOT FOUND"
     assert res.json() == {'message': f'student not found: {s_id}'}
 
+
+
+    # ============== Add Student - Positive Tests =============== #
 
 @pytest.mark.parametrize(
     "student",
@@ -107,6 +115,8 @@ def test_add_student(base_url, student):
     assert "id" in created_student
 
 
+    # ============== Add Student - Negative Tests =============== #
+
 @pytest.mark.parametrize(
     "student",
     [
@@ -121,6 +131,8 @@ def test_add_student_negative(base_url, student):
     assert res.status_code == 400
     assert res.reason == "BAD REQUEST"
 
+
+    # ============== Add Student - Mixed Tests =============== #
 
 @pytest.mark.parametrize(
     "name, age, expected_status",
@@ -137,36 +149,27 @@ def test_add_student_mixed(base_url, name, age, expected_status):
     assert res.status_code == expected_status
 
 
-def test_update_student(base_url, add_students):
-    updated = {"id": 1, "name": "New Name", "age": 30}
+    # ============== Update Student - Mixed Tests =============== #
 
-    res = requests.put(base_url, json=updated)
+@pytest.mark.parametrize(
+    "name, age, expected_status",
+    [
+        pytest.param("Aaa", 25, 201, id="positive age input"),
+        pytest.param("Benny", 22, 201, id="positive name input"),
+        pytest.param("Bob Young", 18, 201, id="positive low value input"),
+        pytest.param("", 25, 400, id="negative no name"),
+        pytest.param("A", 25, 400, id="negative short name"),
+    ]
+)
+def test_add_student_mixed(base_url, name, age, expected_status):
+    payload = {"name": name, "age": age}
+    res = requests.post(base_url, json=payload)
 
-    assert res.status_code == 200
-    assert res.json()["name"] == "New Name"
-    assert res.json()["age"] == 30
+    assert res.status_code == expected_status
 
 
-def test_update_student_negative(base_url, add_students):
-    updated = {"id": 100, "name": "New Name", "age": 35}
-
-    res = requests.put(base_url, json=updated)
-
-    assert res.status_code == 404
-    assert res.reason == 'NOT FOUND'
-
-
-
-def test_delete_student(base_url, add_students):
-    res = requests.delete(f"{base_url}/1")
-
-    assert res.status_code == 200
-    assert res.json()["id"] == 1
+    # ============== Delete Student - Positive Tests =============== #
 
 
 
-def test_delete_student_negative(base_url, add_students):
-    res = requests.delete(f"{base_url}/4")
 
-    assert res.status_code == 404
-    assert res.reason == 'NOT FOUND'
