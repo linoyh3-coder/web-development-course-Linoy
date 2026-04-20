@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch, Mock
 
-import students_app_hitech_school.app_students.service as service
-from students_app_hitech_school.app_students.service import ServiceError
+import students_app_hitech_school.app.service as service
+from students_app_hitech_school.app.service import ServiceError
 
 class TestService(TestCase):
 
