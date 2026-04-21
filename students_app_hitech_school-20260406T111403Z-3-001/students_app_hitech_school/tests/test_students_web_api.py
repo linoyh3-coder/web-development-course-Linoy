@@ -202,6 +202,23 @@ def test_update_student_mixed(base_url, add_students, student_id, name, age, exp
         assert data["age"] == age
 
 
+def test_update_student_effect(base_url, add_students):
+    payload = {"name": "Updated student", "age": 25}
+    res = requests.put(f"{base_url}/1", json=payload)
+
+    res = requests.get(f"{base_url}/1")
+    data = res.json()
+
+    assert data["name"] == "Updated student"
+    assert data["age"] == 25
+
+
+def test_update_non_existing_student(base_url, add_students):
+    payload = {"name": "Updated student", "age": 25}
+    res = requests.put(f"{base_url}/444", json=payload)
+    assert res.status_code == 405
+
+
 # ================= DELETE STUDENT ================= #
 
 @pytest.mark.parametrize(
@@ -221,3 +238,40 @@ def test_delete_student_mixed(base_url, add_students, student_id, expected_statu
         # בדיקה שהתלמיד באמת נמחק מהמערכת
         res = requests.get(f"{base_url}/{student_id}")
         assert res.status_code == 404
+
+
+def test_delete_twice(base_url, add_students):
+    requests.delete(f"{base_url}/1")
+    res = requests.delete(f"{base_url}/1")
+
+    assert res.status_code ==404
+
+
+def test_delete_does_not_affect_others(base_url, add_students):
+    requests.delete(f"{base_url}/1")
+    res = requests.get(base_url)
+
+    assert len(res.json()) == 2
+
+# =============== Flow Tests ================ #
+
+def test_full_flow(base_url):
+    # create
+    res = requests.post(base_url, json={"name":"Flow student", "age": 25})
+    student = res.json()
+    student_id = student["id"]
+
+    # get
+    res = requests.get(f"{base_url}/{student_id}")
+    assert res.status_code == 200
+    assert res.reason == "OK"
+
+    # update - BUG - ID API ROUTE
+    res = requests.put(f"{base_url}/{student_id}", json={"name":"Flow student 2", "age":30})
+    res = requests.get(f"{base_url}/{student_id}")
+    assert res.json()["name"] == "Flow student 2"
+
+    # delete
+    res = requests.delete(f"{base_url}/{student_id}")
+    res = requests.get(f"{base_url}/{student_id}")
+    assert res.status_code == 404
