@@ -257,21 +257,28 @@ def test_delete_does_not_affect_others(base_url, add_students):
 
 def test_full_flow(base_url):
     # create
-    res = requests.post(base_url, json={"name":"Flow student", "age": 25})
+    res = requests.post(base_url, json={"name": "Flow", "age": 25})
+    assert res.status_code == 201
     student = res.json()
     student_id = student["id"]
 
     # get
     res = requests.get(f"{base_url}/{student_id}")
     assert res.status_code == 200
-    assert res.reason == "OK"
 
-    # update - BUG - ID API ROUTE
-    res = requests.put(f"{base_url}/{student_id}", json={"name":"Flow student 2", "age":30})
+    # update
+    res = requests.put(f"{base_url}/{student_id}", json={"name": "Flow2", "age": 30})
+    assert res.status_code == 200
+
+    # verify update
     res = requests.get(f"{base_url}/{student_id}")
-    assert res.json()["name"] == "Flow student 2"
+    assert res.json()["name"] == "Flow2"
+    assert res.json()["age"] == 30
 
     # delete
     res = requests.delete(f"{base_url}/{student_id}")
+    assert res.status_code == 200
+
+    # verify delete
     res = requests.get(f"{base_url}/{student_id}")
     assert res.status_code == 404
