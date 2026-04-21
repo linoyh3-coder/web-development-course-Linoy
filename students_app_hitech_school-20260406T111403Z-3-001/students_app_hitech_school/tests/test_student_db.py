@@ -1,7 +1,6 @@
 import pytest
 from students_app_hitech_school.app import db
 
-
 # ================= FIXTURES ================= #
 
 @pytest.fixture(autouse=True)
@@ -27,69 +26,55 @@ def sample_student():
     except Exception:
         pass
 
+    # ================= CREATE ================= #
 
-# ================= CREATE ================= #
-
-@pytest.mark.parametrize(
-    "student",
-    [
-        pytest.param({"name": "A", "age": 20}, id="min valid"),
-        pytest.param({"name": "B", "age": 120}, id="max age"),
-        pytest.param({"name": "Long Name", "age": 30}, id="normal"),
-    ]
-)
-def test_add_student_valid(student):
-    added = db.add_student(student.copy())
+@pytest.mark.parametrize("student_test", [
+    pytest.param({"name":"Leo", "age": 18}, id="min input"),
+    pytest.param({"name":"Ben Harris", "age": 120}, id="high input"),
+    pytest.param({"name":"avi", "age": 30}, id="normal input"),
+])
+def test_add_student_valid(student_test):
+    added = db.add_student(student_test)
 
     assert "id" in added
-    assert added["name"] == student["name"]
-    assert added["age"] == student["age"]
+    assert added["name"] == student_test["name"]
+    assert added["age"] == student_test["age"]
 
 
-@pytest.mark.parametrize(
-    "student",
-    [
-        pytest.param({"name": "A", "age": "twenty"}, id="invalid age"),
-        pytest.param({"name": "A"}, id="missing age"),
-    ]
-)
-def test_add_student_invalid(student):
+@pytest.mark.parametrize("student_test",[
+    pytest.param({"name": "A", "age":"twenty"}, id="invalid age"),
+    pytest.param({"name":"A"}, id="missing age"),
+])
+def test_add_student_invalid(student_test):
     with pytest.raises(Exception):
-        db.add_student(student)
+        db.add_student(student_test)
 
 
 # ================= READ ================= #
 
 def test_get_student(sample_student):
     result = db.get_student(sample_student["id"])
-
     assert result == sample_student
 
-
-@pytest.mark.parametrize("bad_id", [999, None, "123"])
-def test_get_student_negative(bad_id):
+@pytest.mark.parametrize("s_id", [100,-200,"123"])
+def test_get_student_negative(s_id):
     with pytest.raises(Exception):
-        db.get_student(bad_id)
+        db.get_student(s_id)
 
 
 # ================= UPDATE ================= #
 
 def test_update_student(sample_student):
-    updated = db.update_student({
-        "id": sample_student["id"],
-        "name": "Updated",
-        "age": 30
-    })
-
+    updated = db.update_student(
+        {"id": sample_student["id"] ,"name":"Harry", "age":28}
+    )
     assert updated["id"] == sample_student["id"]
-    assert updated["name"] == "Updated"
-    assert updated["age"] == 30
-
+    assert updated["name"] == "Harry"
+    assert updated["age"] == 28
 
 def test_update_non_existing():
     with pytest.raises(Exception):
         db.update_student({"id": 999, "name": "X", "age": 20})
-
 
 # ================= DELETE ================= #
 
@@ -101,11 +86,10 @@ def test_delete_student(sample_student):
     with pytest.raises(Exception):
         db.get_student(sample_student["id"])
 
-
-@pytest.mark.parametrize("bad_id", [999, -1])
-def test_delete_negative(bad_id):
+@pytest.mark.parametrize("s_id", [888, -1])
+def test_delete_student_negative(s_id):
     with pytest.raises(Exception):
-        db.delete_student(bad_id)
+        db.delete_student(s_id)
 
 
 # ================= FULL FLOW ================= #
