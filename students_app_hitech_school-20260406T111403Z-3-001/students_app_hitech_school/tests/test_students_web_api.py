@@ -43,7 +43,7 @@ def test_get_all_students(base_url, add_students):
     assert res.status_code == 200
     assert res.reason == "OK"
 
-    # משווה בין מה שבשרת למה שהוכנס בפיוצ'ר
+    # משווה בין מה שבשרת למה שהוכנס בפיצ'ר
     assert res.json() == add_students
 
 
@@ -54,7 +54,7 @@ def test_get_one_student_simple(base_url, add_students):
     assert res.status_code == 200
     assert res.reason == "OK"
 
-    # תלמיד ראשון מתוך הרשימה שהוזרקה בפיוצ'ר
+    # תלמיד ראשון מתוך הרשימה שהוזרקה בפיצ'ר
     assert res.json() == add_students[0]
 
 
@@ -142,7 +142,7 @@ def test_add_student(base_url, student):
     [
         pytest.param({"name": "AA", "age": 17}, id="too young"),
         pytest.param({"name": "Benny", "age": 121}, id="too old"),
-        pytest.param({"name": "A", "age": 25}, id="name too short"),
+        pytest.param({"name": "A", "age": 25}, id="short name"),
         pytest.param({"name": "", "age": 25}, id="no name"),
     ],
 )
@@ -174,7 +174,7 @@ def test_add_student_mixed(base_url, name, age, expected_status):
 
 # ================= UPDATE STUDENT ================= #
 
-@pytest.mark.xfail(reason="BUG: update endpoint ignores student_id (not RESTful)")
+@pytest.mark.xfail(reason="BUG: update endpoint ignores student_id (not RESTFUL)")
 @pytest.mark.parametrize(
     "student_id, name, age, expected_status",
     [
@@ -185,7 +185,7 @@ def test_add_student_mixed(base_url, name, age, expected_status):
     ]
 )
 def test_update_student_mixed(base_url, add_students, student_id, name, age, expected_status):
-    # בדיקה של עדכון תלמיד קיים (למרות שה-API כרגע שבור בזה)
+    # בדיקה של עדכון תלמיד קיים
     payload = {"name": name, "age": age}
 
     # BUG: ה-API לא תומך ב- /students/<id>
@@ -203,9 +203,13 @@ def test_update_student_mixed(base_url, add_students, student_id, name, age, exp
 
 
 def test_update_student_effect(base_url, add_students):
-    payload = {"name": "Updated student", "age": 25}
-    res = requests.put(f"{base_url}/1", json=payload)
+    payload = {"id": 1, "name": "Updated student", "age": 25}
 
+    #  PUT
+    res = requests.put(base_url, json=payload)
+    assert res.status_code == 200
+
+    # בדיקה
     res = requests.get(f"{base_url}/1")
     data = res.json()
 
@@ -216,7 +220,7 @@ def test_update_student_effect(base_url, add_students):
 def test_update_non_existing_student(base_url, add_students):
     payload = {"name": "Updated student", "age": 25}
     res = requests.put(f"{base_url}/444", json=payload)
-    assert res.status_code == 405
+    assert res.status_code == 404
 
 
 # ================= DELETE STUDENT ================= #
@@ -267,7 +271,10 @@ def test_full_flow(base_url):
     assert res.status_code == 200
 
     # update
-    res = requests.put(f"{base_url}/{student_id}", json={"name": "Flow2", "age": 30})
+    res = requests.put(
+        base_url,
+        json={"id": student_id, "name": "Flow2", "age": 30}
+    )
     assert res.status_code == 200
 
     # verify update
