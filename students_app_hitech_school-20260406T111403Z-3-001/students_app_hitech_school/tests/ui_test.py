@@ -51,7 +51,7 @@ class AppTest(unittest.TestCase):
         self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", element)
 
         # המתנה עד שהאלמנט קליקבילי
-        self.wait.until(EC.element_to_be_clickable(element))  # ⚠️ עדיף להשתמש ב-locator
+        self.wait.until(EC.element_to_be_clickable(element))  #  עדיף להשתמש ב-locator
 
         try:
             element.click()  # ניסיון קליק רגיל
