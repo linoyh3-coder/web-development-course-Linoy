@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 
 driver = webdriver.Chrome()
+driver.maximize_window()
 wait = WebDriverWait(driver, 15)
 
 driver.get("https://www.youtube.com")
