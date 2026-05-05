@@ -33,12 +33,12 @@ def sample_student():
 # ================= CREATE ================= #
 
 # מריץ את אותו טסט כמה פעמים עם נתונים שונים
-@pytest.mark.jira_key("SAFP-13")
 @pytest.mark.parametrize("student_test", [
     pytest.param({"name":"Leo", "age": 18}, id="min input"),
     pytest.param({"name":"Ben Harris", "age": 120}, id="high input"),
     pytest.param({"name":"avi", "age": 30}, id="normal input"),
 ])
+@pytest.mark.jira_key("SAFP-13")
 def test_safp_13_add_student_valid(student_test):
 
     # Act - מוסיף תלמיד
@@ -50,11 +50,12 @@ def test_safp_13_add_student_valid(student_test):
     assert added["age"] == student_test["age"]  # גיל נשמר נכון
 
 
-@pytest.mark.jira_key("SAFP-13")
+
 @pytest.mark.parametrize("student_test",[
     pytest.param({"name": "A", "age":"twenty"}, id="invalid age"),  # גיל לא מספר
     pytest.param({"name":"A"}, id="missing age"),  # חסר גיל
 ])
+@pytest.mark.jira_key("SAFP-13")
 def test_safp_13_add_student_invalid(student_test):
 
     # מצפים לשגיאה
@@ -73,8 +74,10 @@ def test_safp_16_get_student(sample_student):
     # Assert - בדיקה שהתוצאה זהה למה שיצרנו
     assert result == sample_student
 
+
+@pytest.mark.parametrize("s_id", [100,-200,"123"])
+# ID לא תקינים
 @pytest.mark.jira_key("SAFP-16")
-@pytest.mark.parametrize("s_id", [100,-200,"123"])  # ID לא תקינים
 def test_safp_16_get_student_negative(s_id):
 
     # מצפים לשגיאה
@@ -121,8 +124,10 @@ def test_safp_15_delete_student(sample_student):
     with pytest.raises(Exception):
         db.get_student(sample_student["id"])
 
+
+@pytest.mark.parametrize("s_id", [888, -1])
+# ID לא תקינים
 @pytest.mark.jira_key("SAFP-15")
-@pytest.mark.parametrize("s_id", [888, -1])  # ID לא תקינים
 def test_safp_15_delete_student_negative(s_id):
 
     # מצפים לשגיאה
