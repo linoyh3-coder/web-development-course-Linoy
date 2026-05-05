@@ -29,6 +29,8 @@ try:
     )
     first_video.click()
 
+    time.sleep(5)
+
     print("נפתח סרטון בהצלחה")
 
 except Exception as e:
