@@ -1,5 +1,5 @@
 # Workflow name displayed in GitHub Actions
-name: Student App CI to Jira
+name: Student_App_Finel_Project
 # Trigger: Run this workflow on every push to the main branch
 on:
   push:
